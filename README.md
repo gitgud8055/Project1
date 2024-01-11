@@ -31,8 +31,8 @@ Ta cũng xét hàm đánh giá T(node) tương tự với thuật toán A*. Như
 - Thuật toán A*: đây là một phiên bản cải tiến của thuật toán Dijkstra, từ thực nghiệm cho thấy thuật toán này cho ra kết quả khá nhanh. Tuy đây có thể không phải đường đi ngắn nhất mà ta cần tìm, nhưng nó cũng là một đường đi "gần" ngắn nhất. Đổi lại, ta có thể tìm ra đường đi đó một cách nhanh chóng.
 - Thuật toán Theta*: đây là một phiên bản khác của thuật toán A*, nhằm đánh giá tốc độ thực thi trong các điều kiện khác nhau. Dựa theo độ phức tạp thuật toán, đây là thuật toán có độ phức tạp lớn nhất, nhưng lại có thể tìm ra kết quả thỏa mãn trong thời gian ngắn nhất.
 ### 4. Hướng dẫn sử dụng và lưu ý:
+Những thư viện cần thiết để thực thi chương trình: pygame <br/>
 Giao diện bao gồm: bảng ma trận, các lựa chọn thuật toán và thông báo thuật toán đang được sử dụng. <br/>
-Những thư viện cần thiết để thực thi chương trình: pygame
 Ý nghĩa của các màu trong ma trận:
 - Màu xanh lam (blue): Điểm bắt đầu
 - Màu xanh lục (green): Điểm kết thúc
