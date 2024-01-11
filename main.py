@@ -3,12 +3,10 @@ from queue import PriorityQueue
 
 import pygame
 
-# Pygame initialization
 pygame.init()
 
-# Screen
 WIDTH = 500
-ROWS = 50 # Rows val
+ROWS = 50 # 50 x 50
 WIN = pygame.display.set_mode((WIDTH+200, WIDTH+50))
 pygame.display.set_caption("Some Pathfinding Algorithm in Maze game")
 
