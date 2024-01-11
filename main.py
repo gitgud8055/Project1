@@ -27,9 +27,8 @@ DARK_BLUE = (0,0,139)
 font = pygame.font.Font(None, 12)
 
 class Node():
-    """ Class Node represents single cell in the grid """
     def __init__(self, row, col, width, total_rows):
-        """ Init function """
+        """ Các thông số của một node """
         self.row = row
         self.col = col
         self.x = row * width
@@ -48,19 +47,19 @@ class Node():
         self.text = str(value)
 
     def get_pos(self):
-        """ Returns the position in the grid """
+        """Lấy vị trí hiện tại"""
         return self.row, self.col
 
     def is_color(self, color):
-        """ Checks the type of node by color """
+        """ Kiểm tra màu của ô hiện tại """
         return self.color == color
 
     def set_color(self, color):
-        """ Sets the type of node by color """
+        """ đổi màu ô hiện tại"""
         self.color = color
 
     def draw(self, win):
-        """ Drawing the individual nodes """
+        """Vẽ cho từng ô node """
         pygame.draw.rect(win, self.color, (self.x, self.y , self.width, self.width))
         self.surface.fill(self.color)
         text_surface = font.render(self.text, True, BLACK)
@@ -68,7 +67,7 @@ class Node():
         self.surface.blit(text_surface, text_rect)
 
     def update_neighbours(self, grid):
-        """ Sets neighbouring nodes """
+        """ cập nhật các ô có thể đến """
         self.neighbours = []
         if self.row < self.total_rows - 1 and not grid[self.row + 1][self.col].is_color(BLACK): # Down
             self.neighbours.append(grid[self.row + 1][self.col])
@@ -92,13 +91,13 @@ class Node():
 
 
 def h(p1, p2):
-    """ Aproximated distance """
+    """ Halminton distance """
     x1, y1 = p1
     x2, y2 = p2
     return abs(x1 - x2) + abs(y1 - y2)
 
 def get_clicked_pos(pos, rows, width):
-    """ Get the row and column based on click position """
+    """ lấy vị trí của ô dựa vào click chuột """
     gap = width // rows
     x, y = pos
 
@@ -115,14 +114,14 @@ def get_clicked_pos(pos, rows, width):
     return row, col
 
 def reconstruct_path(came_from, current, draw):
-    """ Draws the path """
+    """Vẽ đường trace back """
     while current in came_from:
         current = came_from[current]
         current.set_color(PURPLE)
         draw()
 
 def make_grid(rows, width):
-    """ Initializng the grid """
+    """ Tạo ma trận """
     grid = []
     gap = width // rows
 
@@ -135,7 +134,7 @@ def make_grid(rows, width):
     return grid
 
 def draw_grid(win, width, rows):
-    """ Draws the grid """
+    """ Vẽ lưới của ma trận """
     gap = width // rows
     for i in range(rows):
         pygame.draw.line(win, GRAY, (0, i * gap), (width, i * gap))
@@ -150,6 +149,7 @@ def pause():
     #print(WIN)
     
 def check_event(grid, draw, came_from, start):
+    """Kiểm tra các event khi sử dụng tính năng Pause"""
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -190,6 +190,7 @@ def dijkstra(draw, grid, start, end):
     cnt = 0
     dist = {node: int("-1") for row in grid for node in row}
     dist[start] = 0
+    """Khởi tạo các giá trị"""
     while st.__len__() > 0:
         check_event(grid, draw, came_from, start)
         cur = st.popleft()
@@ -199,7 +200,7 @@ def dijkstra(draw, grid, start, end):
             end.set_color(GREEN)
             start.set_color(BLUE)
             return True
-            
+        # Thực hiện thuật toán + đổi màu + cập nhật các ô kế tiếp
         for nxt in cur.neighbours:
             if nxt in vis:
                 continue
@@ -220,38 +221,38 @@ def dijkstra(draw, grid, start, end):
 def aStar(draw, grid, start, end):
     """ A* algorithm """
     count = 0
-    open_set = PriorityQueue() # Setting the inital PriorityQueue
+    open_set = PriorityQueue() 
     open_set.put((0, count, start))
-    came_from = {} # This actually represents the shortest path
+    came_from = {} 
 
-    g_score = {node: float("inf") for row in grid for node in row} # Infinite g_score
+    g_score = {node: float("inf") for row in grid for node in row} # Hàm đường đi ngắn nhất F(node)
     g_score[start] = 0
-    f_score = {node: float("inf") for row in grid for node in row} # Infinite f_score
+    f_score = {node: float("inf") for row in grid for node in row} # Hàm đánh giá T(node)
     f_score[start] = h(start.get_pos(), end.get_pos())
 
-    open_set_hash = {start} # Hash for getting values fron open_set
+    open_set_hash = {start} 
     paused = False
     dist = {node: int("-1") for row in grid for node in row}
     dist[start] = 0
+    # Khởi tạo
     while not open_set.empty():
         #print(pygame.event.get())
         check_event(grid, draw, came_from, start)
         
-        current = open_set.get()[2] # Get the current node
+        current = open_set.get()[2] 
         if current not in open_set_hash:
             continue
         open_set_hash.remove(current)
 
-        if current == end: # If it reached the end
+        if current == end: 
             reconstruct_path(came_from, end, draw)
             end.set_color(GREEN)
             start.set_color(BLUE)
             return True
-
-        for neighbour in current.neighbours: # Looping through every neighbour
+        # Thực hiện thuật toán và cập nhật những ô liên quan
+        for neighbour in current.neighbours: 
             temp_g_score = g_score[current] + 1
 
-            # Calculating the neighbours f_score
             if temp_g_score < g_score[neighbour]:
                 came_from[neighbour] = current
                 g_score[neighbour] = temp_g_score
@@ -266,29 +267,30 @@ def aStar(draw, grid, start, end):
 
         draw()
 
-        if current != start: # Closes nodes
+        if current != start: 
             current.set_color(RED)
             
     return False
 
 def thetaStar(draw, grid, start, end):
-    """ D* algorithm """
+    """ Theta* algorithm """
     count = 0
-    open_set = PriorityQueue() # Setting the inital PriorityQueue
+    open_set = PriorityQueue() 
     
-    came_from = {} # This actually represents the shortest path
+    came_from = {} 
 
-    g_score = {node: float("inf") for row in grid for node in row} # Infinite g_score
+    g_score = {node: float("inf") for row in grid for node in row} # Hàm đường đi ngắn nhất F(node)
     g_score[start] = 0
-    f_score = {node: float("inf") for row in grid for node in row} # Infinite f_score
+    f_score = {node: float("inf") for row in grid for node in row} # Hàm đánh giá T(node)
     f_score[start] = h(start.get_pos(), end.get_pos())
     open_set.put((f_score[start], count, start))
     cnt = {node: int("0") for row in grid for node in row}
     cnt[start] = 1
     dist = {node: int("-1") for row in grid for node in row}
-    open_set_hash = {start} # Hash for getting values fron open_set
+    open_set_hash = {start} 
     paused = False
     open_set_hash.remove(start)
+    # Khởi tạo
 
     while not open_set.empty():
         #print(pygame.event.get())
@@ -296,23 +298,22 @@ def thetaStar(draw, grid, start, end):
         now = open_set.get()
         if now[0] != f_score[now[2]]:
             continue
-        current = now[2] # Get the current node
+        current = now[2] 
         if current  in open_set_hash:
             continue
         #open_set_hash.remove(current)
         open_set_hash.add(current)
 
-        if current == end: # If it reached the end
+        if current == end: 
             reconstruct_path(came_from, end, draw)
             end.set_color(GREEN)
             start.set_color(BLUE)
             return True
-
-        for neighbour in current.neighbours8: # Looping through every neighbour
+        # Thực hiện thuật toán và cập nhật những ô liên quan
+        for neighbour in current.neighbours8: 
             temp_g_score = g_score[current] + 1
             cnt[neighbour] += 1
 
-            # Calculating the neighbours f_score
             if temp_g_score < g_score[neighbour]:
                 came_from[neighbour] = current
                 g_score[neighbour] = temp_g_score
@@ -327,22 +328,23 @@ def thetaStar(draw, grid, start, end):
 
         draw()
 
-        if current != start: # Closes nodes
+        if current != start: 
             current.set_color(RED)
             
     return False
 
 def draw(win, grid, width, rows, name_algorithm):
-    """ Draws elements on the screen """
+    """ Vẽ giao diện """
     win.fill(WHITE)
 
-    """ Drawing the nodes """
+    """ Vẽ các node của ma trận """
     for row in grid:
         for node in row:
             node.draw(win)
             win.blit(node.surface, (node.x, node.y))
             
-    draw_grid(win, width, rows) # Drawing the grid
+    draw_grid(win, width, rows) # Vẽ lưới ma trận
+    """Tạo các lựa chọn và hiện thị lựa chọn hiện tại"""
     pygame.draw.rect(WIN, LAVENDER, (525, 25, 150, 75))
     pygame.draw.rect(WIN, LAVENDER, (525, 125, 150, 75))
     pygame.draw.rect(WIN, LAVENDER, (525, 225, 150, 75))
@@ -358,21 +360,19 @@ def draw(win, grid, width, rows, name_algorithm):
     pygame.display.update()
 
 def main(win):
-    """ Main method which handles the function calls, also handles the input """
     run = True
 
-    # Start and end nodes
+    # node bắt đầu và kết thúc
     start = None
     end = None
 
     grid = make_grid(ROWS, WIDTH)
     algorithm = dijkstra
     name_algorithm = "Dijkstra"
-    # Main loop
+    # Thuật toán default là dijkstra
     while run:
-        # Drawing the screen
         draw(win, grid, WIDTH, ROWS, name_algorithm)
-
+        # Xử lí các event
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -393,7 +393,7 @@ def main(win):
                         algorithm = thetaStar
                         flag = False
                         
-            if flag and pygame.mouse.get_pressed()[0]: # Left click
+            if flag and pygame.mouse.get_pressed()[0]: # chuột trái
                 pos = pygame.mouse.get_pos()
                 row, col = get_clicked_pos(pos, ROWS, WIDTH)
                 node = grid[row][col]
@@ -407,7 +407,7 @@ def main(win):
                 elif node != end and node != start:
                     node.set_color(BLACK)
 
-            if flag and pygame.mouse.get_pressed()[2]: # Right click
+            if flag and pygame.mouse.get_pressed()[2]: # chuột phải
                 pos = pygame.mouse.get_pos()
                 row, col = get_clicked_pos(pos, ROWS, WIDTH)
                 node = grid[row][col]
@@ -419,24 +419,23 @@ def main(win):
                     end = None
             
 
-            if event.type == pygame.KEYDOWN:
+            if event.type == pygame.KEYDOWN: # Thực thi thuật toán
                 if event.key == pygame.K_RETURN and start and end:
                     for row in grid:
                         for node in row:
                             node.update_neighbours(grid)
                     for row in grid:
                         for node in row:
+                            node.add_text("")
                             if (node != start and node != end and not node.is_color(BLACK)):
                                 node.set_color(WHITE)
-                                node.add_text("")
                     algorithm(lambda: draw(win, grid, WIDTH, ROWS, name_algorithm), grid, start, end)
 
-                if event.key == pygame.K_c:
+                if event.key == pygame.K_c: # xóa ma trận
                     start = None
                     end = None
                     grid = make_grid(ROWS, WIDTH)
 
-    # Game quit
     pygame.quit()
 
 if __name__ == "__main__":
